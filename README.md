@@ -17,8 +17,6 @@ The frontend of the application is available [here](https://prodify-45241.web.ap
 - **Node.js**: JavaScript runtime for building server-side applications.
 - **Express.js**: Web framework for handling HTTP requests and building APIs.
 - **MongoDB**: NoSQL database for storing product and user data.
-- **Mongoose**: MongoDB object modeling tool for schema-based data handling.
-- **JWT**: For managing authentication tokens.
 - **Cors**: Middleware for handling cross-origin requests.
 
 ## Getting Started
@@ -35,8 +33,8 @@ To get a local copy up and running, follow these steps.
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/rafiferdos/prodify-backend.git
-    cd prodify-backend
+    git clone https://github.com/rafiferdos/prodify-server.git
+    cd prodify-server
     ```
 
 2. **Install dependencies**:
