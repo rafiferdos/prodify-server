@@ -46,6 +46,43 @@ async function run() {
             res.json(products);
         });
 
+        // Pagination route
+        app.get('/products', async (req, res) => {
+            try {
+                // Extract the page number from the query, default to 1 if not provided
+                const page = parseInt(req.query.page) || 1;
+
+                // Define the number of items per page (8 in your case)
+                const limit = 8;
+
+                // Calculate the number of documents to skip
+                const skip = (page - 1) * limit;
+
+                // Fetch the total number of products
+                const totalProducts = await product_collection.countDocuments();
+
+                // Fetch the products for the specific page using .skip() and .limit()
+                const products = await product_collection.find()
+                    .skip(skip)
+                    .limit(limit)
+                    .toArray(); // Convert cursor to array
+
+                // Calculate total pages
+                const totalPages = Math.ceil(totalProducts / limit);
+
+                // Send the response with pagination data
+                res.json({
+                    products,
+                    currentPage: page,
+                    totalPages,
+                    totalProducts
+                });
+            } catch (err) {
+                console.error("Error fetching paginated products:", err); // Log the error
+                res.status(500).json({ error: 'Server error' });
+            }
+        });
+
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
