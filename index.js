@@ -46,26 +46,27 @@ async function run() {
             res.json(products);
         });
 
-        // Pagination route
+        // Pagination and category filter route
         app.get('/products', async (req, res) => {
             try {
-                // Extract the page number from the query, default to 1 if not provided
-                const page = parseInt(req.query.page) || 1;
-
-                // Define the number of items per page (8 in your case)
+                const { page = 1, category } = req.query;
                 const limit = 8;
-
-                // Calculate the number of documents to skip
                 const skip = (page - 1) * limit;
 
-                // Fetch the total number of products
-                const totalProducts = await product_collection.countDocuments();
+                const query = {};
+                // Add category filtering if category is provided
+                if (category) {
+                    query.category = category;
+                }
 
-                // Fetch the products for the specific page using .skip() and .limit()
-                const products = await product_collection.find()
+                // Fetch total number of products with the applied filter (if any)
+                const totalProducts = await product_collection.countDocuments(query);
+
+                // Fetch products for the specific page, filtered by category if present
+                const products = await product_collection.find(query)
                     .skip(skip)
                     .limit(limit)
-                    .toArray(); // Convert cursor to array
+                    .toArray();
 
                 // Calculate total pages
                 const totalPages = Math.ceil(totalProducts / limit);
@@ -73,12 +74,12 @@ async function run() {
                 // Send the response with pagination data
                 res.json({
                     products,
-                    currentPage: page,
+                    currentPage: parseInt(page),
                     totalPages,
                     totalProducts
                 });
             } catch (err) {
-                console.error("Error fetching paginated products:", err); // Log the error
+                console.error("Error fetching filtered and paginated products:", err);
                 res.status(500).json({ error: 'Server error' });
             }
         });
