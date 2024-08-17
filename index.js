@@ -84,6 +84,20 @@ async function run() {
             }
         });
 
+        // search by productName for the route `/api/products?search=${query}`
+        app.get('/products/search', async (req, res) => {
+            try {
+                const { search } = req.query;
+                const query = { productName: { $regex: search, $options: 'i' } };
+                const products = await product_collection.find(query).toArray();
+                res.json(products);
+            } catch (err) {
+                console.error("Error fetching products by search query:", err);
+                res.status(500).json({ error: 'Server error' });
+            }
+        }
+        );
+
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
