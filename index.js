@@ -39,6 +39,13 @@ async function run() {
         // connect database
         const prodify_db = client.db("prodify");
         const product_collection = prodify_db.collection("products");
+
+        // routes
+        app.get('/all_products', async (req, res) => {
+            const products = await product_collection.find().toArray();
+            res.json(products);
+        });
+
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
@@ -46,3 +53,11 @@ async function run() {
     }
 }
 run().catch(console.dir);
+
+app.get('/', (req, res) => {
+    res.send("Hello World");
+})
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+})
