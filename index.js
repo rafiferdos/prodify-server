@@ -49,27 +49,24 @@ async function run() {
         // Pagination and category filter route
         app.get('/products', async (req, res) => {
             try {
-                const { page = 1, category } = req.query;
+                const { page = 1, category, minPrice = 1, maxPrice = 2000 } = req.query;
                 const limit = 8;
                 const skip = (page - 1) * limit;
 
-                const query = {};
+                // Construct the query
+                let query = {
+                    price: { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) },
+                };
+
                 // Add category filtering if category is provided
                 if (category) {
                     query.category = category;
                 }
 
-                // Fetch total number of products with the applied filter (if any)
-                const totalProducts = await product_collection.countDocuments(query);
-
-                // Fetch products for the specific page, filtered by category if present
-                const products = await product_collection.find(query)
-                    .skip(skip)
-                    .limit(limit)
-                    .toArray();
-
-                // Calculate total pages
-                const totalPages = Math.ceil(totalProducts / limit);
+        // Fetch the products from the database
+        const products = await product_collection.find(query).skip(skip).limit(limit).toArray();
+        const totalProducts = await product_collection.countDocuments(query);
+        const totalPages = Math.ceil(totalProducts / limit);
 
                 // Send the response with pagination data
                 res.json({
